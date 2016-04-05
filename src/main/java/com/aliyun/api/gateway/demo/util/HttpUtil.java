@@ -85,8 +85,13 @@ public class HttpUtil {
      */
     public static HttpResponse httpPost(String url, Map<String, String> headers, Map<String, String> formParam, String appKey, String appSecret, int timeout, List<String> signHeaderPrefixList)
             throws Exception {
-        headers = initialBasicHeader(headers, appKey, appSecret, HttpMethod.POST, url, formParam, signHeaderPrefixList);
+        if (headers == null) {
+            headers = new HashMap<String, String>();
+        }
+
         headers.put(HttpHeader.HTTP_HEADER_CONTENT_TYPE, ContentType.CONTENT_TYPE_FORM);
+
+        headers = initialBasicHeader(headers, appKey, appSecret, HttpMethod.POST, url, formParam, signHeaderPrefixList);
 
         HttpClient httpClient = new DefaultHttpClient();
         httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, getTimeout(timeout));
