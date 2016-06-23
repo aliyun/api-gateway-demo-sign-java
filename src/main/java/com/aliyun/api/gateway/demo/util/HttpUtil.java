@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.*;
 
 import com.aliyun.api.gateway.demo.constant.*;
+import com.sun.xml.internal.ws.handler.MessageUpdatableContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -64,7 +65,7 @@ public class HttpUtil {
         HttpGet get = new HttpGet(url);
 
         for (Map.Entry<String, String> e : headers.entrySet()) {
-            get.addHeader(e.getKey(), e.getValue());
+            get.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
 
         return httpClient.execute(get);
@@ -98,7 +99,7 @@ public class HttpUtil {
 
         HttpPost post = new HttpPost(url);
         for (Map.Entry<String, String> e : headers.entrySet()) {
-            post.addHeader(e.getKey(), e.getValue());
+            post.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
 
         UrlEncodedFormEntity formEntity = buildFormEntity(formParam);
@@ -129,7 +130,7 @@ public class HttpUtil {
 
         HttpPost post = new HttpPost(url);
         for (Map.Entry<String, String> e : headers.entrySet()) {
-            post.addHeader(e.getKey(), e.getValue());
+            post.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
 
         if (StringUtils.isNotBlank(body)) {
@@ -160,7 +161,7 @@ public class HttpUtil {
 
         HttpPost post = new HttpPost(url);
         for (Map.Entry<String, String> e : headers.entrySet()) {
-            post.addHeader(e.getKey(), e.getValue());
+            post.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
 
         if (bytes != null) {
@@ -169,38 +170,6 @@ public class HttpUtil {
         }
 
         return httpClient.execute(post);
-    }
-
-    /**
-     * HTTP PUT表单
-     *
-     * @param url                  http://host+path+query
-     * @param headers              Http头
-     * @param formParam            表单参数
-     * @param appKey               APP KEY
-     * @param appSecret            APP密钥
-     * @param timeout              超时时间（毫秒）
-     * @param signHeaderPrefixList 自定义参与签名Header前缀
-     * @return 调用结果
-     * @throws Exception
-     */
-    public static HttpResponse httpPut(String url, Map<String, String> headers, Map<String, String> formParam, String appKey, String appSecret, int timeout, List<String> signHeaderPrefixList)
-            throws Exception {
-        headers = initialBasicHeader(headers, appKey, appSecret, HttpMethod.PUT, url, formParam, signHeaderPrefixList);
-        HttpClient httpClient = new DefaultHttpClient();
-        httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, getTimeout(timeout));
-
-        HttpPut put = new HttpPut(url);
-        for (Map.Entry<String, String> e : headers.entrySet()) {
-            put.addHeader(e.getKey(), e.getValue());
-        }
-
-        UrlEncodedFormEntity formEntity = buildFormEntity(formParam);
-        if (formEntity != null) {
-            put.setEntity(formEntity);
-        }
-
-        return httpClient.execute(put);
     }
 
     /**
@@ -223,7 +192,7 @@ public class HttpUtil {
 
         HttpPut put = new HttpPut(url);
         for (Map.Entry<String, String> e : headers.entrySet()) {
-            put.addHeader(e.getKey(), e.getValue());
+            put.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
 
         if (StringUtils.isNotBlank(body)) {
@@ -254,7 +223,7 @@ public class HttpUtil {
 
         HttpPut put = new HttpPut(url);
         for (Map.Entry<String, String> e : headers.entrySet()) {
-            put.addHeader(e.getKey(), e.getValue());
+            put.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
 
         if (bytes != null) {
@@ -284,7 +253,7 @@ public class HttpUtil {
 
         HttpDelete delete = new HttpDelete(url);
         for (Map.Entry<String, String> e : headers.entrySet()) {
-            delete.addHeader(e.getKey(), e.getValue());
+            delete.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
 
         return httpClient.execute(delete);
@@ -303,7 +272,7 @@ public class HttpUtil {
             for (String key : formParam.keySet()) {
                 nameValuePairList.add(new BasicNameValuePair(key, formParam.get(key)));
             }
-            UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(nameValuePairList);
+            UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(nameValuePairList,Constants.ENCODING);
             formEntity.setContentType(ContentType.CONTENT_TYPE_FORM);
             return formEntity;
         }

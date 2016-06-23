@@ -18,12 +18,12 @@
  */
 package com.aliyun.api.gateway.demo.util;
 
+import com.aliyun.api.gateway.demo.constant.Constants;
+import org.apache.commons.codec.binary.Base64;
+
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
-import com.aliyun.api.gateway.demo.constant.Constants;
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * 消息摘要工具
@@ -32,14 +32,14 @@ public class MessageDigestUtil {
     /**
      * 先进行MD5摘要再进行Base64编码获取摘要字符串
      *
-     * @param inStr
+     * @param str
      * @return
      */
-    public static String base64AndMD5(String inStr) {
-        if (inStr == null) {
+    public static String base64AndMD5(String str) {
+        if (str == null) {
             throw new IllegalArgumentException("inStr can not be null");
         }
-        return base64AndMD5(toBytes(inStr));
+        return base64AndMD5(toBytes(str));
     }
 
     /**
@@ -60,6 +60,42 @@ public class MessageDigestUtil {
             return new String(enbytes);
         } catch (final NoSuchAlgorithmException e) {
             throw new IllegalArgumentException("unknown algorithm MD5");
+        }
+    }
+
+    /**
+     * UTF-8编码转换为ISO-9959-1
+     *
+     * @param str
+     * @return
+     */
+    public static String utf8ToIso88591(String str) {
+        if (str == null) {
+            return str;
+        }
+
+        try {
+            return new String(str.getBytes("UTF-8"), "ISO-8859-1");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * ISO-9959-1编码转换为UTF-8
+     *
+     * @param str
+     * @return
+     */
+    public static String iso88591ToUtf8(String str) {
+        if (str == null) {
+            return str;
+        }
+
+        try {
+            return new String(str.getBytes("ISO-8859-1"), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 

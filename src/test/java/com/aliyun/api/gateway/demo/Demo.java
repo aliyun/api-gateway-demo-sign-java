@@ -27,6 +27,7 @@ import com.aliyun.api.gateway.demo.util.MessageDigestUtil;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.junit.Test;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -173,34 +174,6 @@ public class Demo {
     }
 
     /**
-     * HTTP PUT 表单
-     *
-     * @throws Exception
-     */
-    @Test
-    public void putForm() throws Exception {
-        //请求URL
-        String url = "/demo/put/form";
-
-        Map<String, String> bodyParam = new HashMap<String, String>();
-        bodyParam.put("FormParamKey", "FormParamValue");
-
-        Map<String, String> headers = new HashMap<String, String>();
-        //（可选）响应内容序列化格式,默认application/json,目前仅支持application/json
-        headers.put(HttpHeader.HTTP_HEADER_ACCEPT, "application/json");
-
-        Request request = new Request(Method.PUT_FORM, HttpSchema.HTTP + HOST + url, APP_KEY, APP_SECRET, Constants.DEFAULT_TIMEOUT);
-        request.setHeaders(headers);
-        request.setSignHeaderPrefixList(CUSTOM_HEADERS_TO_SIGN_PREFIX);
-        request.setFormBody(bodyParam);
-
-        //调用服务端
-        HttpResponse response = Client.execute(request);
-
-        print(response);
-    }
-
-    /**
      * HTTP PUT 字符串
      *
      * @throws Exception
@@ -296,7 +269,7 @@ public class Demo {
         StringBuilder sb = new StringBuilder();
         sb.append(response.getStatusLine().getStatusCode()).append(Constants.LF);
         for (Header header : response.getAllHeaders()) {
-            sb.append(header.toString()).append(Constants.LF);
+            sb.append(MessageDigestUtil.iso88591ToUtf8(header.getValue())).append(Constants.LF);
         }
         sb.append(readStreamAsStr(response.getEntity().getContent())).append(Constants.LF);
         System.out.println(sb.toString());

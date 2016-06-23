@@ -42,8 +42,6 @@ public class Client {
                 return HttpUtil.httpPost(request.getUrl(), request.getHeaders(), request.getStringBody(), request.getAppKey(), request.getAppSecret(), request.getTimeout(), request.getSignHeaderPrefixList());
             case POST_BYTES:
                 return HttpUtil.httpPost(request.getUrl(), request.getHeaders(), request.getBytesBody(), request.getAppKey(), request.getAppSecret(), request.getTimeout(), request.getSignHeaderPrefixList());
-            case PUT_FORM:
-                return HttpUtil.httpPut(request.getUrl(), request.getHeaders(), request.getFormBody(), request.getAppKey(), request.getAppSecret(), request.getTimeout(), request.getSignHeaderPrefixList());
             case PUT_STRING:
                 return HttpUtil.httpPut(request.getUrl(), request.getHeaders(), request.getStringBody(), request.getAppKey(), request.getAppSecret(), request.getTimeout(), request.getSignHeaderPrefixList());
             case PUT_BYTES:
