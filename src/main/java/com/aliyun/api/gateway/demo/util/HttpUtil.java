@@ -21,6 +21,7 @@ package com.aliyun.api.gateway.demo.util;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.*;
 
 import com.aliyun.api.gateway.demo.constant.*;
@@ -47,22 +48,24 @@ public class HttpUtil {
     /**
      * HTTP GET
      *
-     * @param url                  http://host+path+query
-     * @param headers              Http头
-     * @param appKey               APP KEY
-     * @param appSecret            APP密钥
-     * @param timeout              超时时间（毫秒）
+     * @param url http://host+path+query
+     * @param headers Http头
+     * @param appKey APP KEY
+     * @param appSecret APP密钥
+     * @param timeout 超时时间（毫秒）
      * @param signHeaderPrefixList 自定义参与签名Header前缀
      * @return 调用结果
      * @throws Exception
      */
-    public static HttpResponse httpGet(String url, Map<String, String> headers, String appKey, String appSecret, int timeout, List<String> signHeaderPrefixList) throws Exception {
+    public static HttpResponse httpGet(String url, Map<String, String> headers, String appKey, String appSecret,
+                                       int timeout, List<String> signHeaderPrefixList)
+            throws Exception {
         headers = initialBasicHeader(headers, appKey, appSecret, HttpMethod.GET, url, null, signHeaderPrefixList);
 
         HttpClient httpClient = new DefaultHttpClient();
         httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, getTimeout(timeout));
-        
-        HttpGet get = new HttpGet(url);
+
+        HttpGet get = new HttpGet(encodeUrl(url));
 
         for (Map.Entry<String, String> e : headers.entrySet()) {
             get.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
@@ -74,17 +77,18 @@ public class HttpUtil {
     /**
      * HTTP POST表单
      *
-     * @param url                  http://host+path+query
-     * @param headers              Http头
-     * @param formParam            表单参数
-     * @param appKey               APP KEY
-     * @param appSecret            APP密钥
-     * @param timeout              超时时间（毫秒）
+     * @param url http://host+path+query
+     * @param headers Http头
+     * @param formParam 表单参数
+     * @param appKey APP KEY
+     * @param appSecret APP密钥
+     * @param timeout 超时时间（毫秒）
      * @param signHeaderPrefixList 自定义参与签名Header前缀
      * @return 调用结果
      * @throws Exception
      */
-    public static HttpResponse httpPost(String url, Map<String, String> headers, Map<String, String> formParam, String appKey, String appSecret, int timeout, List<String> signHeaderPrefixList)
+    public static HttpResponse httpPost(String url, Map<String, String> headers, Map<String, String> formParam,
+                                        String appKey, String appSecret, int timeout, List<String> signHeaderPrefixList)
             throws Exception {
         if (headers == null) {
             headers = new HashMap<String, String>();
@@ -97,7 +101,7 @@ public class HttpUtil {
         HttpClient httpClient = new DefaultHttpClient();
         httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, getTimeout(timeout));
 
-        HttpPost post = new HttpPost(url);
+        HttpPost post = new HttpPost(encodeUrl(url));
         for (Map.Entry<String, String> e : headers.entrySet()) {
             post.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
@@ -113,22 +117,24 @@ public class HttpUtil {
     /**
      * Http POST 字符串
      *
-     * @param url                  http://host+path+query
-     * @param headers              Http头
-     * @param body                 字符串请求体
-     * @param appKey               APP KEY
-     * @param appSecret            APP密钥
-     * @param timeout              超时时间（毫秒）
+     * @param url http://host+path+query
+     * @param headers Http头
+     * @param body 字符串请求体
+     * @param appKey APP KEY
+     * @param appSecret APP密钥
+     * @param timeout 超时时间（毫秒）
      * @param signHeaderPrefixList 自定义参与签名Header前缀
      * @return 调用结果
      * @throws Exception
      */
-    public static HttpResponse httpPost(String url, Map<String, String> headers, String body, String appKey, String appSecret, int timeout, List<String> signHeaderPrefixList) throws Exception {
+    public static HttpResponse httpPost(String url, Map<String, String> headers, String body, String appKey,
+                                        String appSecret, int timeout, List<String> signHeaderPrefixList)
+            throws Exception {
         headers = initialBasicHeader(headers, appKey, appSecret, HttpMethod.POST, url, null, signHeaderPrefixList);
         HttpClient httpClient = new DefaultHttpClient();
         httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, getTimeout(timeout));
 
-        HttpPost post = new HttpPost(url);
+        HttpPost post = new HttpPost(encodeUrl(url));
         for (Map.Entry<String, String> e : headers.entrySet()) {
             post.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
@@ -144,22 +150,24 @@ public class HttpUtil {
     /**
      * HTTP POST 字节数组
      *
-     * @param url                  http://host+path+query
-     * @param headers              Http头
-     * @param bytes                字节数组请求体
-     * @param appKey               APP KEY
-     * @param appSecret            APP密钥
-     * @param timeout              超时时间（毫秒）
+     * @param url http://host+path+query
+     * @param headers Http头
+     * @param bytes 字节数组请求体
+     * @param appKey APP KEY
+     * @param appSecret APP密钥
+     * @param timeout 超时时间（毫秒）
      * @param signHeaderPrefixList 自定义参与签名Header前缀
      * @return 调用结果
      * @throws Exception
      */
-    public static HttpResponse httpPost(String url, Map<String, String> headers, byte[] bytes, String appKey, String appSecret, int timeout, List<String> signHeaderPrefixList) throws Exception {
+    public static HttpResponse httpPost(String url, Map<String, String> headers, byte[] bytes, String appKey,
+                                        String appSecret, int timeout, List<String> signHeaderPrefixList)
+            throws Exception {
         headers = initialBasicHeader(headers, appKey, appSecret, HttpMethod.POST, url, null, signHeaderPrefixList);
         HttpClient httpClient = new DefaultHttpClient();
         httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, getTimeout(timeout));
 
-        HttpPost post = new HttpPost(url);
+        HttpPost post = new HttpPost(encodeUrl(url));
         for (Map.Entry<String, String> e : headers.entrySet()) {
             post.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
@@ -175,22 +183,24 @@ public class HttpUtil {
     /**
      * HTTP PUT 字符串
      *
-     * @param url                  http://host+path+query
-     * @param headers              Http头
-     * @param body                 字符串请求体
-     * @param appKey               APP KEY
-     * @param appSecret            APP密钥
-     * @param timeout              超时时间（毫秒）
+     * @param url http://host+path+query
+     * @param headers Http头
+     * @param body 字符串请求体
+     * @param appKey APP KEY
+     * @param appSecret APP密钥
+     * @param timeout 超时时间（毫秒）
      * @param signHeaderPrefixList 自定义参与签名Header前缀
      * @return 调用结果
      * @throws Exception
      */
-    public static HttpResponse httpPut(String url, Map<String, String> headers, String body, String appKey, String appSecret, int timeout, List<String> signHeaderPrefixList) throws Exception {
+    public static HttpResponse httpPut(String url, Map<String, String> headers, String body, String appKey,
+                                       String appSecret, int timeout, List<String> signHeaderPrefixList)
+            throws Exception {
         headers = initialBasicHeader(headers, appKey, appSecret, HttpMethod.PUT, url, null, signHeaderPrefixList);
         HttpClient httpClient = new DefaultHttpClient();
         httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, getTimeout(timeout));
 
-        HttpPut put = new HttpPut(url);
+        HttpPut put = new HttpPut(encodeUrl(url));
         for (Map.Entry<String, String> e : headers.entrySet()) {
             put.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
@@ -206,22 +216,24 @@ public class HttpUtil {
     /**
      * HTTP PUT字节数组
      *
-     * @param url                  http://host+path+query
-     * @param headers              Http头
-     * @param bytes                字节数组请求体
-     * @param appKey               APP KEY
-     * @param appSecret            APP密钥
-     * @param timeout              超时时间（毫秒）
+     * @param url http://host+path+query
+     * @param headers Http头
+     * @param bytes 字节数组请求体
+     * @param appKey APP KEY
+     * @param appSecret APP密钥
+     * @param timeout 超时时间（毫秒）
      * @param signHeaderPrefixList 自定义参与签名Header前缀
      * @return 调用结果
      * @throws Exception
      */
-    public static HttpResponse httpPut(String url, Map<String, String> headers, byte[] bytes, String appKey, String appSecret, int timeout, List<String> signHeaderPrefixList) throws Exception {
+    public static HttpResponse httpPut(String url, Map<String, String> headers, byte[] bytes, String appKey,
+                                       String appSecret, int timeout, List<String> signHeaderPrefixList)
+            throws Exception {
         headers = initialBasicHeader(headers, appKey, appSecret, HttpMethod.PUT, url, null, signHeaderPrefixList);
         HttpClient httpClient = new DefaultHttpClient();
         httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, getTimeout(timeout));
 
-        HttpPut put = new HttpPut(url);
+        HttpPut put = new HttpPut(encodeUrl(url));
         for (Map.Entry<String, String> e : headers.entrySet()) {
             put.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
@@ -237,21 +249,23 @@ public class HttpUtil {
     /**
      * HTTP DELETE
      *
-     * @param url                  http://host+path+query
-     * @param headers              Http头
-     * @param appKey               APP KEY
-     * @param appSecret            APP密钥
-     * @param timeout              超时时间（毫秒）
+     * @param url http://host+path+query
+     * @param headers Http头
+     * @param appKey APP KEY
+     * @param appSecret APP密钥
+     * @param timeout 超时时间（毫秒）
      * @param signHeaderPrefixList 自定义参与签名Header前缀
      * @return 调用结果
      * @throws Exception
      */
-    public static HttpResponse httpDelete(String url, Map<String, String> headers, String appKey, String appSecret, int timeout, List<String> signHeaderPrefixList) throws Exception {
+    public static HttpResponse httpDelete(String url, Map<String, String> headers, String appKey, String appSecret,
+                                          int timeout, List<String> signHeaderPrefixList)
+            throws Exception {
         headers = initialBasicHeader(headers, appKey, appSecret, HttpMethod.DELETE, url, null, signHeaderPrefixList);
         HttpClient httpClient = new DefaultHttpClient();
         httpClient.getParams().setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, getTimeout(timeout));
 
-        HttpDelete delete = new HttpDelete(url);
+        HttpDelete delete = new HttpDelete(encodeUrl(url));
         for (Map.Entry<String, String> e : headers.entrySet()) {
             delete.addHeader(e.getKey(), MessageDigestUtil.utf8ToIso88591(e.getValue()));
         }
@@ -261,18 +275,20 @@ public class HttpUtil {
 
     /**
      * 构建FormEntity
+     * 
      * @param formParam
      * @return
      * @throws UnsupportedEncodingException
      */
-    private static UrlEncodedFormEntity buildFormEntity(Map<String, String> formParam) throws UnsupportedEncodingException {
+    private static UrlEncodedFormEntity buildFormEntity(Map<String, String> formParam)
+            throws UnsupportedEncodingException {
         if (formParam != null) {
             List<NameValuePair> nameValuePairList = new ArrayList<NameValuePair>();
 
             for (String key : formParam.keySet()) {
                 nameValuePairList.add(new BasicNameValuePair(key, formParam.get(key)));
             }
-            UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(nameValuePairList,Constants.ENCODING);
+            UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(nameValuePairList, Constants.ENCODING);
             formEntity.setContentType(ContentType.CONTENT_TYPE_FORM);
             return formEntity;
         }
@@ -283,17 +299,20 @@ public class HttpUtil {
     /**
      * 初始化基础Header
      *
-     * @param headers              Http头
-     * @param appKey               APP KEY
-     * @param appSecret            APP密钥
-     * @param method               Http方法
-     * @param requestAddress       http://host+path+query
-     * @param formParam            表单参数
+     * @param headers Http头
+     * @param appKey APP KEY
+     * @param appSecret APP密钥
+     * @param method Http方法
+     * @param requestAddress http://host+path+query
+     * @param formParam 表单参数
      * @param signHeaderPrefixList 自定义参与签名Header前缀
      * @return 基础Header
      * @throws MalformedURLException
      */
-    private static Map<String, String> initialBasicHeader(Map<String, String> headers, String appKey, String appSecret, String method, String requestAddress, Map formParam, List<String> signHeaderPrefixList) throws MalformedURLException {
+    private static Map<String, String> initialBasicHeader(Map<String, String> headers, String appKey, String appSecret,
+                                                          String method, String requestAddress, Map formParam,
+                                                          List<String> signHeaderPrefixList)
+            throws MalformedURLException {
         if (headers == null) {
             headers = new HashMap<String, String>();
         }
@@ -312,13 +331,15 @@ public class HttpUtil {
         headers.put(SystemHeader.X_CA_TIMESTAMP, String.valueOf(new Date().getTime()));
         headers.put(SystemHeader.X_CA_NONCE, UUID.randomUUID().toString());
         headers.put(SystemHeader.X_CA_KEY, appKey);
-        headers.put(SystemHeader.X_CA_SIGNATURE, SignUtil.sign(method, stringBuilder.toString(), headers, formParam, appSecret, signHeaderPrefixList));
+        headers.put(SystemHeader.X_CA_SIGNATURE,
+                SignUtil.sign(method, stringBuilder.toString(), headers, formParam, appSecret, signHeaderPrefixList));
 
         return headers;
     }
 
     /**
      * 读取超时时间
+     * 
      * @param timeout
      * @return
      */
@@ -328,5 +349,40 @@ public class HttpUtil {
         }
 
         return timeout;
+    }
+
+    /**
+     * 对Query参数进行编码
+     * 
+     * @param url
+     * @return
+     */
+    private static String encodeUrl(String url) {
+        if (StringUtils.isBlank(url)) {
+            return url;
+        }
+
+        try {
+            URL tmpUrl = new URL(url);
+            StringBuilder sb = new StringBuilder();
+            sb.append(tmpUrl.getProtocol());
+            if (StringUtils.isNotBlank(tmpUrl.getProtocol())) {
+                sb.append("://");
+            }
+            sb.append(tmpUrl.getHost());
+            if (StringUtils.isNotBlank(tmpUrl.getPath())) {
+                sb.append(tmpUrl.getPath());
+            }
+            if (StringUtils.isNotBlank(tmpUrl.getQuery())) {
+                sb.append("?");
+                sb.append(URLEncoder.encode(tmpUrl.getQuery(), Constants.ENCODING));
+            }
+
+            return sb.toString();
+        } catch (MalformedURLException e) {
+            return url;
+        } catch (UnsupportedEncodingException e) {
+            return url;
+        }
     }
 }
