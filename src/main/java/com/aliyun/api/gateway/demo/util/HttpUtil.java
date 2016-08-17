@@ -375,7 +375,20 @@ public class HttpUtil {
             }
             if (StringUtils.isNotBlank(tmpUrl.getQuery())) {
                 sb.append("?");
-                sb.append(URLEncoder.encode(tmpUrl.getQuery(), Constants.ENCODING));
+
+                boolean flag = false;
+                for (String s : tmpUrl.getQuery().split("\\&")) {
+                    if (flag) {
+                        sb.append("&");
+                    }
+
+                    flag = true;
+                    String key = s.split("\\=")[0];
+                    String value = s.split("\\=")[1];
+                    sb.append(key);
+                    sb.append("=");
+                    sb.append(URLEncoder.encode(value, Constants.ENCODING));
+                }
             }
 
             return sb.toString();
