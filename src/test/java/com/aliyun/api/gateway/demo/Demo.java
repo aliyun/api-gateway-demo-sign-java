@@ -18,19 +18,20 @@
  */
 package com.aliyun.api.gateway.demo;
 
+import com.alibaba.fastjson.JSON;
 import com.aliyun.api.gateway.demo.constant.Constants;
 import com.aliyun.api.gateway.demo.constant.ContentType;
 import com.aliyun.api.gateway.demo.constant.HttpHeader;
 import com.aliyun.api.gateway.demo.constant.HttpSchema;
 import com.aliyun.api.gateway.demo.enums.Method;
 import com.aliyun.api.gateway.demo.util.MessageDigestUtil;
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.junit.Test;
+import sun.misc.BASE64Encoder;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -46,11 +47,11 @@ import java.util.Map;
  */
 public class Demo {
     //APP KEY
-    private final static String APP_KEY = "app_key";
+    private final static String APP_KEY = "23438824";
     // APP密钥
-    private final static String APP_SECRET = "app_secret";
+    private final static String APP_SECRET = "a3a6751c0a033eef4df182c321b21796";
     //API域名
-    private final static String HOST = "api_host";
+    private final static String HOST = "dm-53.data.aliyun.com";
     //自定义参与签名Header前缀（可选,默认只有"X-Ca-"开头的参与到Header签名）
     private final static List<String> CUSTOM_HEADERS_TO_SIGN_PREFIX = new ArrayList<String>();
 
@@ -91,7 +92,7 @@ public class Demo {
     @Test
     public void postForm() throws Exception {
         //请求URL
-        String url = "/demo/post/form";
+        String url = "/rest/160601/ocr/ocr_vehicle.json";
 
         Map<String, String> bodyParam = new HashMap<String, String>();
         bodyParam.put("FormParamKey", "FormParamValue");
@@ -119,22 +120,32 @@ public class Demo {
     @Test
     public void postString() throws Exception {
         //请求URL
-        String url = "/demo/post/string";
+        String url = "/rest/160601/ocr/ocr_vehicle.json";
         //Body内容
-        String body = "demo string body content";
+        DemoBean demoBean = new DemoBean();
+        List beanList = new ArrayList<DemoBean.InputsBean>();
+        DemoBean.InputsBean inputsBean = new DemoBean.InputsBean();
+        DemoBean.InputsBean.ImageBean imageBean = new DemoBean.InputsBean.ImageBean();
+        imageBean.setDataType(50);
+        imageBean.setDataValue(getPDFBinary(new File("D:\\4.jpg")));
+        inputsBean.setImage(imageBean);
+        beanList.add(inputsBean);
+        demoBean.setInputs(beanList);
 
         Map<String, String> headers = new HashMap<String, String>();
         //（可选）响应内容序列化格式,默认application/json,目前仅支持application/json
         headers.put(HttpHeader.HTTP_HEADER_ACCEPT, "application/json");
         //（可选）Body MD5,服务端会校验Body内容是否被篡改,建议Body非Form表单时添加此Header
-        headers.put(HttpHeader.HTTP_HEADER_CONTENT_MD5, MessageDigestUtil.base64AndMD5(body));
+        headers.put(HttpHeader.HTTP_HEADER_CONTENT_MD5, MessageDigestUtil.base64AndMD5(JSON.toJSONString(demoBean)));
         //（POST/PUT请求必选）请求Body内容格式
         headers.put(HttpHeader.HTTP_HEADER_CONTENT_TYPE, ContentType.CONTENT_TYPE_TEXT);
 
-        Request request = new Request(Method.POST_STRING, HttpSchema.HTTP + HOST + url, APP_KEY, APP_SECRET, Constants.DEFAULT_TIMEOUT);
+
+        Request request = new Request(Method.POST_STRING, HttpSchema.HTTPS + HOST + url, APP_KEY, APP_SECRET, Constants.DEFAULT_TIMEOUT);
         request.setHeaders(headers);
         request.setSignHeaderPrefixList(CUSTOM_HEADERS_TO_SIGN_PREFIX);
-        request.setStringBody(body);
+        request.setStringBody(JSON.toJSONString(demoBean));
+
 
         //调用服务端
         HttpResponse response = Client.execute(request);
@@ -150,9 +161,17 @@ public class Demo {
     @Test
     public void postBytes() throws Exception {
         //请求URL
-        String url = "/demo/post/bytes";
+        String url = "/rest/160601/ocr/ocr_vehicle.json";
+
+        String pre = "{'inputs': [{'image': {'dataType': 50,'dataValue': '";
+//        byte[] picBytes = getPDFBinary(new File("D:\\3.jpg"));
+        String end = "'}}]}";
         //Body内容
-        byte[] bytesBody = "demo bytes body content".getBytes(Constants.ENCODING);
+        ;
+        byte[] bytesBody = pre.getBytes(Constants.ENCODING);
+//        bytesBody = ArrayUtils.addAll(bytesBody,Base64.encodeBase64String(picBytes).getBytes());
+        bytesBody = ArrayUtils.addAll(bytesBody,end.getBytes(Constants.ENCODING));
+
 
         Map<String, String> headers = new HashMap<String, String>();
         //（可选）响应内容序列化格式,默认application/json,目前仅支持application/json
@@ -162,7 +181,7 @@ public class Demo {
         //（POST/PUT请求必选）请求Body内容格式
         headers.put(HttpHeader.HTTP_HEADER_CONTENT_TYPE, ContentType.CONTENT_TYPE_TEXT);
 
-        Request request = new Request(Method.POST_BYTES, HttpSchema.HTTP + HOST + url, APP_KEY, APP_SECRET, Constants.DEFAULT_TIMEOUT);
+        Request request = new Request(Method.POST_BYTES, HttpSchema.HTTPS + HOST + url, APP_KEY, APP_SECRET, Constants.DEFAULT_TIMEOUT);
         request.setHeaders(headers);
         request.setSignHeaderPrefixList(CUSTOM_HEADERS_TO_SIGN_PREFIX);
         request.setBytesBody(bytesBody);
@@ -297,5 +316,53 @@ public class Demo {
         dest.close();
 
         return new String(bos.toByteArray(), Constants.ENCODING);
+    }
+
+    static BASE64Encoder encoder = new sun.misc.BASE64Encoder();
+    static String getPDFBinary(File file) {
+        FileInputStream fin =null;
+        BufferedInputStream bin =null;
+        ByteArrayOutputStream baos = null;
+        BufferedOutputStream bout =null;
+        try {
+            //建立读取文件的文件输出流
+            fin = new FileInputStream(file);
+            //在文件输出流上安装节点流（更大效率读取）
+            bin = new BufferedInputStream(fin);
+            // 创建一个新的 byte 数组输出流，它具有指定大小的缓冲区容量
+            baos = new ByteArrayOutputStream();
+            //创建一个新的缓冲输出流，以将数据写入指定的底层输出流
+            bout = new BufferedOutputStream(baos);
+            byte[] buffer = new byte[1024];
+            int len = bin.read(buffer);
+            while(len != -1){
+                bout.write(buffer, 0, len);
+                len = bin.read(buffer);
+            }
+            //刷新此输出流并强制写出所有缓冲的输出字节，必须这行代码，否则有可能有问题
+            bout.flush();
+            byte[] bytes = baos.toByteArray();
+//            return bytes;
+            //sun公司的API
+            return encoder.encodeBuffer(bytes).trim();
+            //apache公司的API
+            //return Base64.encodeBase64String(bytes);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally{
+            try {
+                fin.close();
+                bin.close();
+                //关闭 ByteArrayOutputStream 无效。此类中的方法在关闭此流后仍可被调用，而不会产生任何 IOException
+                //baos.close();
+                bout.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 }

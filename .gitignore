@@ -1,0 +1,21 @@
+# general
+*~
+*.log
+tmp
+dump
+**/.DS_Store
+.svn/
+.idea/
+.metadata/
+RemoteSystemsTempFiles/
+.project
+Thumbs.db
+*.iml
+log.*/
+target/
+#node
+**/node_modules/
+rebel.xml
+/.settings/
+/.classpath
+/install.sh

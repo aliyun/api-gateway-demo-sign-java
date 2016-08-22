@@ -18,14 +18,7 @@
  */
 package com.aliyun.api.gateway.demo.util;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.util.*;
-
 import com.aliyun.api.gateway.demo.constant.*;
-import com.sun.xml.internal.ws.handler.MessageUpdatableContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -35,11 +28,25 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.CoreConnectionPNames;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.security.cert.X509Certificate;
+import java.util.*;
 
 /**
  * Http工具类
@@ -143,7 +150,7 @@ public class HttpUtil {
             post.setEntity(new StringEntity(body, Constants.ENCODING));
 
         }
-
+        httpClient = wrapClient(httpClient);
         return httpClient.execute(post);
     }
 
@@ -176,7 +183,7 @@ public class HttpUtil {
             post.setEntity(new ByteArrayEntity(bytes));
 
         }
-
+        httpClient = wrapClient(httpClient);
         return httpClient.execute(post);
     }
 
@@ -396,6 +403,40 @@ public class HttpUtil {
             return url;
         } catch (UnsupportedEncodingException e) {
             return url;
+        }
+    }
+
+    //以下是wrapClient方法
+    /**
+     * 获取可信任https链接，以避免不受信任证书出现peer not authenticated异常
+     *
+     * @param base
+     * @return
+     */
+    public static HttpClient wrapClient(HttpClient base) {
+        try {
+            SSLContext ctx = SSLContext.getInstance("TLS");
+            X509TrustManager tm = new X509TrustManager() {
+                public void checkClientTrusted(X509Certificate[] xcs,
+                                               String string) {
+                }
+                public void checkServerTrusted(X509Certificate[] xcs,
+                                               String string) {
+                }
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+            };
+            ctx.init(null, new TrustManager[] { tm }, null);
+            SSLSocketFactory ssf = new SSLSocketFactory(ctx);
+            ssf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            ClientConnectionManager ccm = base.getConnectionManager();
+            SchemeRegistry sr = ccm.getSchemeRegistry();
+            sr.register(new Scheme("https", ssf, 443));
+            return new DefaultHttpClient(ccm, base.getParams());
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return null;
         }
     }
 }
