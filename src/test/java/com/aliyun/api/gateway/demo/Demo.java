@@ -69,7 +69,7 @@ public class Demo {
         String url = "/demo/get?qk1=qv2&qkn=qvn";
 
         Map<String, String> headers = new HashMap<String, String>();
-        //（可选）响应内容序列化格式,默认application/json,目前仅支持application/json
+        //（必填）根据期望的Response内容类型设置
         headers.put(HttpHeader.HTTP_HEADER_ACCEPT, "application/json");
         headers.put("CustomHeader", "demo");
 
@@ -97,7 +97,7 @@ public class Demo {
         bodyParam.put("FormParamKey", "FormParamValue");
 
         Map<String, String> headers = new HashMap<String, String>();
-        //（可选）响应内容序列化格式,默认application/json,目前仅支持application/json
+        //（必填）根据期望的Response内容类型设置
         headers.put(HttpHeader.HTTP_HEADER_ACCEPT, "application/json");
 
         Request request = new Request(Method.POST_FORM, HttpSchema.HTTP + HOST + url, APP_KEY, APP_SECRET, Constants.DEFAULT_TIMEOUT);
@@ -124,7 +124,7 @@ public class Demo {
         String body = "demo string body content";
 
         Map<String, String> headers = new HashMap<String, String>();
-        //（可选）响应内容序列化格式,默认application/json,目前仅支持application/json
+        //（必填）根据期望的Response内容类型设置
         headers.put(HttpHeader.HTTP_HEADER_ACCEPT, "application/json");
         //（可选）Body MD5,服务端会校验Body内容是否被篡改,建议Body非Form表单时添加此Header
         headers.put(HttpHeader.HTTP_HEADER_CONTENT_MD5, MessageDigestUtil.base64AndMD5(body));
@@ -155,7 +155,7 @@ public class Demo {
         byte[] bytesBody = "demo bytes body content".getBytes(Constants.ENCODING);
 
         Map<String, String> headers = new HashMap<String, String>();
-        //（可选）响应内容序列化格式,默认application/json,目前仅支持application/json
+        //（必填）根据期望的Response内容类型设置
         headers.put(HttpHeader.HTTP_HEADER_ACCEPT, "application/json");
         //（可选）Body MD5,服务端会校验Body内容是否被篡改,建议Body非Form表单时添加此Header
         headers.put(HttpHeader.HTTP_HEADER_CONTENT_MD5, MessageDigestUtil.base64AndMD5(bytesBody));
@@ -186,7 +186,7 @@ public class Demo {
         String body = "demo string body content";
 
         Map<String, String> headers = new HashMap<String, String>();
-        //（可选）响应内容序列化格式,默认application/json,目前仅支持application/json
+        //（必填）根据期望的Response内容类型设置
         headers.put(HttpHeader.HTTP_HEADER_ACCEPT, "application/json");
         //（可选）Body MD5,服务端会校验Body内容是否被篡改,建议Body非Form表单时添加此Header
         headers.put(HttpHeader.HTTP_HEADER_CONTENT_MD5, MessageDigestUtil.base64AndMD5(body));
@@ -217,7 +217,7 @@ public class Demo {
         byte[] bytesBody = "demo bytes body content".getBytes(Constants.ENCODING);
 
         Map<String, String> headers = new HashMap<String, String>();
-        //（可选）响应内容序列化格式,默认application/json,目前仅支持application/json
+        //（必填）根据期望的Response内容类型设置
         headers.put(HttpHeader.HTTP_HEADER_ACCEPT, "application/json");
         //（可选）Body MD5,服务端会校验Body内容是否被篡改,建议Body非Form表单时添加此Header
         headers.put(HttpHeader.HTTP_HEADER_CONTENT_MD5, MessageDigestUtil.base64AndMD5(bytesBody));
@@ -246,7 +246,7 @@ public class Demo {
         String url = "/demo/delete";
 
         Map<String, String> headers = new HashMap<String, String>();
-        //（可选）响应内容序列化格式,默认application/json,目前仅支持application/json
+        //（必填）根据期望的Response内容类型设置
         headers.put(HttpHeader.HTTP_HEADER_ACCEPT, "application/json");
 
         Request request = new Request(Method.DELETE, HttpSchema.HTTP + HOST + url, APP_KEY, APP_SECRET, Constants.DEFAULT_TIMEOUT);
