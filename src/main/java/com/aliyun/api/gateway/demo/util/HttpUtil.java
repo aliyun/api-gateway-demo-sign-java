@@ -25,7 +25,6 @@ import java.net.URLEncoder;
 import java.util.*;
 
 import com.aliyun.api.gateway.demo.constant.*;
-import com.sun.xml.internal.ws.handler.MessageUpdatableContext;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
